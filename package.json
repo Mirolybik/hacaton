@@ -6,7 +6,8 @@
   "scripts": {
     "build": "tsc -p tsconfig.json --noCheck",
     "start": "node dist/server.js",
-    "dev": "tsc -p tsconfig.json && node --watch dist/server.js"
+    "dev": "tsc -p tsconfig.json && node --watch dist/server.js",
+    "test": "node --test tests/api/requests.test.cjs"
   },
   "dependencies": {
     "bcrypt": "^6.0.0",
