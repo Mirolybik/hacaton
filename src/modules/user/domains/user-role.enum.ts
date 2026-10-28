@@ -1,5 +1,5 @@
 export enum UserRole {
-  OperationalTechnician = "OperationalTechnician",
-  ServiceEngineer = "ServiceEngineer",
-  TechnicialDirector = "TechnicialDirector",
+  duty = "duty",
+  engineer = "engineer",
+  director = "director",
 }
