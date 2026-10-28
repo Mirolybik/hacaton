@@ -2,7 +2,11 @@ import { randomUUID } from "crypto";
 import { RequestHistory } from "./domains/request-history.model";
 import { RequestStatus } from "./domains/request-info.types";
 import { Request } from "./domains/request.model";
-import { CreateRequestInput, ListRequestsQuery } from "./request.schema";
+import {
+  CreateRequestInput,
+  ListRequestsQuery,
+  UpdateRequestInput,
+} from "./request.schema";
 import { v4 as uuidv4 } from "uuid";
 import { UserRole } from "../user/domains/user-role.enum";
 import { Op } from "sequelize";
@@ -63,5 +67,21 @@ export class RequestRepository {
 
   public async updateRequestStatus(id: string, newStatus: RequestStatus) {
     await Request.update({ status: newStatus }, { where: { id: id } });
+  }
+
+  public async updateRequest(id: string, data: UpdateRequestInput) {
+    const request = await Request.findByPk(id);
+
+    if (request) {
+      for (const [field, value] of Object.entries(data)) {
+        if (value === undefined) continue;
+        request.set(field as any, value);
+      }
+
+      if (data.status === "done") {
+        request.completedAt = new Date();
+      }
+      await request?.save();
+    }
   }
 }

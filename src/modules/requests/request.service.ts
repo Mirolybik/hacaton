@@ -18,13 +18,6 @@ import {
 } from "./domains/request-info.types";
 import { Equipment } from "../equipment/domains/equipment.model";
 
-export type Role = "duty" | "engineer" | "director";
-
-export type Actor = {
-  name: string;
-  role: Role;
-};
-
 const DIRECTOR_FIELDS = ["priority", "dueAt", "assignee"];
 const ENGINEER_FIELDS = [
   "status",
@@ -187,7 +180,7 @@ export class RequestService {
         );
       }
 
-      if (data.status === "in_progress" && !(data.assignee ?? request.userId)) {
+      if (data.status === "in_progress" && !(data.userId ?? request.userId)) {
         throw new HttpError(400, "Сначала назначьте исполнителя");
       }
 
@@ -212,33 +205,6 @@ export class RequestService {
       }
     }
 
-    for (const [field, value] of Object.entries(data)) {
-      if (value === undefined) {
-        continue;
-      }
-
-      const oldValue = request.get(field);
-
-      if (String(oldValue) === String(value)) {
-        continue;
-      }
-
-      // request.set(field, value);
-      // await addHistory(
-      //   request.id,
-      //   actor,
-      //   field === "status" ? "status_changed" : "updated",
-      //   field,
-      //   oldValue,
-      //   value,
-      // );
-    }
-
-    if (data.status === "done") {
-      request.completedAt = new Date();
-    }
-
-    await request.save();
     return request;
   }
 }
