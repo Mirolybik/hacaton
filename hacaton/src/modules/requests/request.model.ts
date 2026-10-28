@@ -1,54 +1,41 @@
-import {
-  DataTypes,
-  Model,
-  type CreationOptional,
-  type InferAttributes,
-  type InferCreationAttributes,
-} from 'sequelize';
+import { DataTypes, Model } from 'sequelize';
 import { sequelize } from '../../db';
 import { Equipment } from '../equipment/equipment.model';
-import type { RequestStatus } from './request-status';
 
 export const REQUEST_TYPES = ['inspection', 'repair'] as const;
+export const REQUEST_PRIORITIES = ['low', 'normal', 'high'] as const;
+export const REQUEST_STATUSES = ['new', 'in_progress', 'waiting_parts', 'done'] as const;
 
 export type RequestType = (typeof REQUEST_TYPES)[number];
-
-export const REQUEST_TYPE_LABELS: Record<RequestType, string> = {
-  inspection: 'Осмотр',
-  repair: 'Ремонт',
-};
-
-export const REQUEST_PRIORITIES = ['low', 'normal', 'high'] as const;
-
 export type RequestPriority = (typeof REQUEST_PRIORITIES)[number];
+export type RequestStatus = (typeof REQUEST_STATUSES)[number];
 
-export const REQUEST_PRIORITY_LABELS: Record<RequestPriority, string> = {
-  low: 'Низкий',
-  normal: 'Обычный',
-  high: 'Высокий',
+export const STATUS_TRANSITIONS: Record<RequestStatus, RequestStatus[]> = {
+  new: ['in_progress'],
+  in_progress: ['waiting_parts', 'done'],
+  waiting_parts: ['in_progress'],
+  done: [],
 };
 
-export class Request extends Model<
-  InferAttributes<Request>,
-  InferCreationAttributes<Request>
-> {
-  declare id: CreationOptional<string>;
+export class Request extends Model {
+  declare id: string;
   declare type: RequestType;
-  declare equipmentId: CreationOptional<string | null>;
+  declare equipmentId: string | null;
   declare description: string;
-  declare priority: CreationOptional<RequestPriority>;
-  declare status: CreationOptional<RequestStatus>;
+  declare priority: RequestPriority;
+  declare status: RequestStatus;
   declare authorName: string;
   declare authorContact: string;
-  declare assignee: CreationOptional<string | null>;
+  declare assignee: string | null;
   declare dueAt: Date;
-  declare diagnostics: CreationOptional<string | null>;
-  declare workDescription: CreationOptional<string | null>;
-  declare waitingComment: CreationOptional<string | null>;
-  declare closingComment: CreationOptional<string | null>;
-  declare completedAt: CreationOptional<Date | null>;
-  declare createdAt: CreationOptional<Date>;
-  declare updatedAt: CreationOptional<Date>;
+  declare diagnostics: string | null;
+  declare workDescription: string | null;
+  declare waitingComment: string | null;
+  declare closingComment: string | null;
+  declare completedAt: Date | null;
+  declare overdue: boolean;
+  declare createdAt: Date;
+  declare updatedAt: Date;
 }
 
 Request.init(
@@ -89,33 +76,101 @@ Request.init(
       type: DataTypes.STRING(200),
       allowNull: false,
     },
-    assignee: { type: DataTypes.STRING(150) },
+    assignee: {
+      type: DataTypes.STRING(150),
+    },
     dueAt: {
       type: DataTypes.DATE,
       allowNull: false,
     },
-    diagnostics: { type: DataTypes.TEXT },
-    workDescription: { type: DataTypes.TEXT },
-    waitingComment: { type: DataTypes.TEXT },
-    closingComment: { type: DataTypes.TEXT },
-    completedAt: { type: DataTypes.DATE },
-    createdAt: { type: DataTypes.DATE, allowNull: false },
-    updatedAt: { type: DataTypes.DATE, allowNull: false },
+    diagnostics: {
+      type: DataTypes.TEXT,
+    },
+    workDescription: {
+      type: DataTypes.TEXT,
+    },
+    waitingComment: {
+      type: DataTypes.TEXT,
+    },
+    closingComment: {
+      type: DataTypes.TEXT,
+    },
+    completedAt: {
+      type: DataTypes.DATE,
+    },
+    overdue: {
+      type: DataTypes.VIRTUAL,
+      get() {
+        const status = this.getDataValue('status');
+        const dueAt = this.getDataValue('dueAt');
+        return status !== 'done' && new Date(dueAt) < new Date();
+      },
+    },
   },
   {
     sequelize,
-    modelName: 'Request',
     tableName: 'requests',
     underscored: true,
   },
 );
 
-Equipment.hasMany(Request, {
-  foreignKey: 'equipmentId',
-  as: 'requests',
-});
+export class RequestHistory extends Model {
+  declare id: string;
+  declare requestId: string;
+  declare userName: string;
+  declare userRole: string;
+  declare action: string;
+  declare field: string | null;
+  declare oldValue: string | null;
+  declare newValue: string | null;
+  declare createdAt: Date;
+}
 
-Request.belongsTo(Equipment, {
-  foreignKey: 'equipmentId',
-  as: 'equipment',
-});
+RequestHistory.init(
+  {
+    id: {
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4,
+      primaryKey: true,
+    },
+    requestId: {
+      type: DataTypes.UUID,
+      allowNull: false,
+      references: { model: Request, key: 'id' },
+      onDelete: 'CASCADE',
+    },
+    userName: {
+      type: DataTypes.STRING(150),
+      allowNull: false,
+    },
+    userRole: {
+      type: DataTypes.STRING(30),
+      allowNull: false,
+    },
+    action: {
+      type: DataTypes.STRING(50),
+      allowNull: false,
+    },
+    field: {
+      type: DataTypes.STRING(100),
+    },
+    oldValue: {
+      type: DataTypes.TEXT,
+    },
+    newValue: {
+      type: DataTypes.TEXT,
+    },
+  },
+  {
+    sequelize,
+    tableName: 'request_history',
+    underscored: true,
+    updatedAt: false,
+  },
+);
+
+Equipment.hasMany(Request, { foreignKey: 'equipmentId', as: 'requests' });
+Request.belongsTo(Equipment, { foreignKey: 'equipmentId', as: 'equipment' });
+
+Request.hasMany(RequestHistory, { foreignKey: 'requestId', as: 'history', onDelete: 'CASCADE' });
+RequestHistory.belongsTo(Request, { foreignKey: 'requestId', as: 'request' });

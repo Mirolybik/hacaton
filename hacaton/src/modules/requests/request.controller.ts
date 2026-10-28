@@ -1,5 +1,6 @@
+import type express from 'express';
 import { asyncHandler } from '../../lib/async-handler';
-import { getActor } from './request-actor';
+import { HttpError } from '../../lib/http-error';
 import {
   createRequestSchema,
   listRequestsQuerySchema,
@@ -12,49 +13,53 @@ import {
   listRequests,
   takeRequest,
   updateRequest,
+  type Actor,
 } from './request.service';
 
-export const create = asyncHandler(async (req, res) => {
-  const actor = getActor(req);
-  const input = createRequestSchema.parse(req.body);
-  const request = await createRequest(input, actor);
+function getActor(req: express.Request): Actor {
+  const name = req.header('x-user-name');
+  const role = req.header('x-user-role');
 
+  if (!name || !role) {
+    throw new HttpError(401, 'Нужны заголовки x-user-name и x-user-role');
+  }
+
+  if (role !== 'duty' && role !== 'engineer' && role !== 'director') {
+    throw new HttpError(403, 'Неизвестная роль');
+  }
+
+  return { name: decodeURIComponent(name), role };
+}
+
+export const create = asyncHandler(async (req, res) => {
+  const request = await createRequest(createRequestSchema.parse(req.body), getActor(req));
   res.status(201).json(request);
 });
 
 export const list = asyncHandler(async (req, res) => {
-  const actor = getActor(req);
-  const query = listRequestsQuerySchema.parse(req.query);
-  const requests = await listRequests(query, actor);
-
+  const requests = await listRequests(listRequestsQuerySchema.parse(req.query), getActor(req));
   res.json(requests);
 });
 
 export const getById = asyncHandler(async (req, res) => {
-  const actor = getActor(req);
-  const request = await getRequest(req.params.id, actor);
-
+  const request = await getRequest(req.params.id, getActor(req));
   res.json(request);
 });
 
 export const update = asyncHandler(async (req, res) => {
-  const actor = getActor(req);
-  const input = updateRequestSchema.parse(req.body);
-  const request = await updateRequest(req.params.id, input, actor);
-
+  const request = await updateRequest(
+    req.params.id,
+    updateRequestSchema.parse(req.body),
+    getActor(req),
+  );
   res.json(request);
 });
 
 export const take = asyncHandler(async (req, res) => {
-  const actor = getActor(req);
-  const request = await takeRequest(req.params.id, actor);
-
+  const request = await takeRequest(req.params.id, getActor(req));
   res.json(request);
 });
 
 export const stats = asyncHandler(async (req, res) => {
-  const actor = getActor(req);
-  const result = await getStats(actor);
-
-  res.json(result);
+  res.json(await getStats(getActor(req)));
 });
