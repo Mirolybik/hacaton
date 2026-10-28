@@ -1,57 +1,77 @@
 
 import { NavLink, Outlet } from 'react-router-dom';
 
+const menuItems = [
+  { path: '/', label: 'Главная', icon: '▦', end: true },
+  { path: '/requests', label: 'Заявки', icon: '☷' },
+  { path: '/equipment', label: 'Оборудование', icon: '⚙' },
+];
+
 export function Layout() {
   return (
-    <div className="layout">
-      <header className="header">
-        <NavLink to="/" className="logo">
-          🌬️ Ветропарк
+    <div className="app-shell">
+      <aside className="sidebar">
+        <NavLink to="/" className="sidebar-brand">
+          <div className="brand-icon">W</div>
+          <div>
+            <strong>WindControl</strong>
+            <small>Управление ветропарком</small>
+          </div>
         </NavLink>
 
-        <nav className="navigation" aria-label="Основное меню">
-          <NavLink
-            to="/"
-            end
-            className={({ isActive }) =>
-              isActive ? 'nav-link active' : 'nav-link'
-            }
-          >
-            Главная
-          </NavLink>
+        <div className="sidebar-section-title">
+          РАБОЧЕЕ ПРОСТРАНСТВО
+        </div>
 
-          <NavLink
-            to="/requests"
-            className={({ isActive }) =>
-              isActive ? 'nav-link active' : 'nav-link'
-            }
-          >
-            Заявки
-          </NavLink>
-
-          <NavLink
-            to="/equipment"
-            className={({ isActive }) =>
-              isActive ? 'nav-link active' : 'nav-link'
-            }
-          >
-            Оборудование
-          </NavLink>
-
-          <NavLink
-            to="/requests/new"
-            className={({ isActive }) =>
-              isActive ? 'nav-link active' : 'nav-link'
-            }
-          >
-            + Создать заявку
-          </NavLink>
+        <nav className="sidebar-nav" aria-label="Основное меню">
+          {menuItems.map((item) => (
+            <NavLink
+              key={item.path}
+              to={item.path}
+              end={item.end}
+              className={({ isActive }) =>
+                `sidebar-link ${isActive ? 'is-active' : ''}`
+              }
+            >
+              <span className="sidebar-link-icon">{item.icon}</span>
+              <span>{item.label}</span>
+            </NavLink>
+          ))}
         </nav>
-      </header>
 
-      <main className="main">
-        <Outlet />
-      </main>
+        <NavLink to="/requests/new" className="sidebar-create">
+          <span>＋</span>
+          Создать заявку
+        </NavLink>
+
+        <div className="sidebar-bottom">
+          <div className="sidebar-system">
+            <span className="system-dot" />
+            Система мониторинга
+          </div>
+          <small>WindControl · Hackathon</small>
+        </div>
+      </aside>
+
+      <div className="workspace">
+        <header className="topbar">
+          <div className="topbar-heading">
+            <span className="topbar-eyebrow">
+              Система управления
+            </span>
+            <strong>Мониторинг ветропарка</strong>
+          </div>
+
+          <div className="topbar-right">
+            <span className="topbar-label">Рабочая панель</span>
+            <div className="user-avatar">W</div>
+          </div>
+        </header>
+
+        <main className="main">
+          <Outlet />
+        </main>
+      </div>
     </div>
   );
 }
