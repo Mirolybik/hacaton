@@ -1,112 +1,141 @@
+import { InferAttributes, InferCreationAttributes } from "sequelize";
 import {
-  DataTypes,
-  InferAttributes,
-  InferCreationAttributes,
+  BelongsTo,
+  BelongsToMany,
+  Column,
+  DataType,
+  ForeignKey,
+  HasMany,
   Model,
-} from "sequelize";
-import { Equipment } from "../../equipment/equipment.model";
-import { sequelize } from "../../../db";
-import { RequestStatus, RequestType } from "./request-info.types";
-import { Table } from "sequelize-typescript";
+  Table,
+} from "sequelize-typescript";
 import { User } from "../../user/domains/user.model";
+import {
+  REQUEST_PRIORITIES,
+  REQUEST_STATUSES,
+  REQUEST_TYPES,
+  RequestStatus,
+  RequestType,
+  RequestPriority,
+} from "./request-info.types";
+import { Equipment } from "../../equipment/domains/equipment.model";
 
-export class Request extends Model {
+@Table({
+  tableName: "requests",
+  underscored: true,
+})
+export class Request extends Model<
+  InferAttributes<Request>,
+  InferCreationAttributes<Request>
+> {
+  @Column({
+    type: DataType.UUID,
+    primaryKey: true,
+    defaultValue: DataType.UUIDV4,
+  })
   declare id: string;
+
+  @Column({
+    type: DataType.ENUM(...Object.values(REQUEST_TYPES)),
+    allowNull: false,
+  })
   declare type: RequestType;
-  declare equipmentId: string | null;
+
+  @Column({
+    type: DataType.TEXT,
+    allowNull: false,
+  })
   declare description: string;
+
+  @Column({
+    type: DataType.ENUM(...Object.values(REQUEST_PRIORITIES)),
+    allowNull: false,
+    defaultValue: "normal",
+  })
   declare priority: RequestPriority;
+
+  @Column({
+    type: DataType.ENUM(...Object.values(REQUEST_STATUSES)),
+    allowNull: false,
+    defaultValue: "new",
+  })
   declare status: RequestStatus;
+
+  @Column({
+    type: DataType.STRING(150),
+    allowNull: false,
+  })
   declare authorName: string;
+
+  @Column({
+    type: DataType.STRING(200),
+    allowNull: false,
+  })
   declare authorContact: string;
-  declare assignee: string | null;
+
+  @Column({
+    type: DataType.DATE,
+    allowNull: false,
+  })
   declare dueAt: Date;
-  declare diagnostics: string | null;
-  declare workDescription: string | null;
-  declare waitingComment: string | null;
-  declare closingComment: string | null;
-  declare completedAt: Date | null;
-  declare overdue: boolean;
-  declare createdAt: Date;
-  declare updatedAt: Date;
-  declare authorId: string;
+
+  @Column({
+    type: DataType.TEXT,
+    allowNull: true,
+  })
+  declare diagnostics: string;
+
+  @Column({
+    type: DataType.TEXT,
+    allowNull: true,
+  })
+  declare workDescription: string;
+
+  @Column({
+    type: DataType.TEXT,
+    allowNull: true,
+  })
+  declare waitingComment: string;
+
+  @Column({
+    type: DataType.TEXT,
+    allowNull: true,
+  })
+  declare closingComment: string;
+
+  @Column({
+    type: DataType.DATE,
+    allowNull: true,
+  })
+  declare completedAt: Date;
+
+  @Column({
+    type: DataType.VIRTUAL,
+    get() {
+      const status = this.getDataValue("status");
+      const dueAt = this.getDataValue("dueAt");
+      return status !== "done" && new Date(dueAt) < new Date();
+    },
+  })
+  declare overdue: string;
+
+  @Column({
+    type: DataType.UUID,
+    allowNull: true,
+  })
+  @ForeignKey(() => User)
+  declare userId: string;
+
+  @BelongsTo(() => User)
+  declare user?: User;
+
+  @Column({
+    type: DataType.UUID,
+    allowNull: true,
+  })
+  @ForeignKey(() => Equipment)
+  declare equipmentId: string;
+
+  @BelongsTo(() => Equipment)
+  declare equipment?: Equipment;
 }
-
-Request.init(
-  {
-    id: {
-      type: DataTypes.UUID,
-      defaultValue: DataTypes.UUIDV4,
-      primaryKey: true,
-    },
-    type: {
-      type: DataTypes.STRING(20),
-      allowNull: false,
-    },
-    equipmentId: {
-      type: DataTypes.STRING(100),
-      references: { model: Equipment, key: "equipment_id" },
-      onDelete: "SET NULL",
-    },
-    description: {
-      type: DataTypes.TEXT,
-      allowNull: false,
-    },
-    priority: {
-      type: DataTypes.STRING(20),
-      allowNull: false,
-      defaultValue: "normal",
-    },
-    status: {
-      type: DataTypes.STRING(30),
-      allowNull: false,
-      defaultValue: "new",
-    },
-    authorName: {
-      type: DataTypes.STRING(150),
-      allowNull: false,
-    },
-    authorContact: {
-      type: DataTypes.STRING(200),
-      allowNull: false,
-    },
-    assignee: {
-      type: DataTypes.STRING(150),
-    },
-    dueAt: {
-      type: DataTypes.DATE,
-      allowNull: false,
-    },
-    diagnostics: {
-      type: DataTypes.TEXT,
-    },
-    workDescription: {
-      type: DataTypes.TEXT,
-    },
-    waitingComment: {
-      type: DataTypes.TEXT,
-    },
-    closingComment: {
-      type: DataTypes.TEXT,
-    },
-    completedAt: {
-      type: DataTypes.DATE,
-    },
-    overdue: {
-      type: DataTypes.VIRTUAL,
-      get() {
-        const status = this.getDataValue("status");
-        const dueAt = this.getDataValue("dueAt");
-        return status !== "done" && new Date(dueAt) < new Date();
-      },
-    },
-  },
-  {
-    sequelize,
-    tableName: "requests",
-    underscored: true,
-  },
-);
-
-Equipment.hasMany(Request, { foreignKey: "equipmentId", as: "requests" });
-Request.belongsTo(Equipment, { foreignKey: "equipmentId", as: "equipment" });

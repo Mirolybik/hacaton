@@ -13,7 +13,15 @@ export class RequestRepository {
   }
 
   public async createRequest(data: CreateRequestInput): Promise<Request> {
-    const result = await Request.create(data);
+    // const result = await Request.create({
+    //   type: data.type,
+    //   equipmentId: data.equipmentId,
+    //   description: data.description,
+    //   priority: data.priority,
+    //   authorName: data.authorName,
+    //   authorContact: data.authorContact,
+    //   dueAt: data.dueAt,
+    // });
     return result;
   }
 

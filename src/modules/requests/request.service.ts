@@ -1,6 +1,5 @@
 import { Op } from "sequelize";
 import { HttpError } from "../../lib/http-error";
-import { Equipment } from "../equipment/equipment.model";
 import type {
   CreateRequestInput,
   ListRequestsQuery,
@@ -18,6 +17,7 @@ import {
   REQUEST_STATUSES,
   STATUS_TRANSITIONS,
 } from "./domains/request-info.types";
+import { Equipment } from "../equipment/domains/equipment.model";
 
 export type Role = "duty" | "engineer" | "director";
 
@@ -53,7 +53,7 @@ export class RequestService {
         overdue += 1;
       }
       if (request.status !== "done") {
-        const assignee = request.assignee ?? "не назначен";
+        const assignee = request.userId ?? "не назначен";
         byAssignee[assignee] = (byAssignee[assignee] ?? 0) + 1;
       }
     }
@@ -93,7 +93,7 @@ export class RequestService {
       throw new NotFoundError("Заявка не найдена!");
     }
 
-    if (request.authorId != userId) {
+    if (request.userId != userId) {
       throw new AccessError("Заявка назначена другому инженеру");
     }
 
@@ -110,14 +110,14 @@ export class RequestService {
       throw new ConflictError("Заявка уже выполнена");
     }
 
-    if (request.authorId && request.authorId !== userId) {
+    if (request.userId && request.userId !== userId) {
       throw new ConflictError("Заявка уже назначена другому инженеру");
     }
 
     await sequelize.transaction(async (t1) => {
       await this.repository.updateRequestStatus(id, "new");
 
-      const oldAssignee = request.assignee;
+      const oldAssignee = request.userId;
       const oldStatus = request.status;
 
       await this.historyRepository.create(
@@ -190,7 +190,7 @@ export class RequestService {
       throw new ConflictError("Заявка уже выполнена");
     }
 
-    if (userRole == UserRole.engineer && request.authorId != userId) {
+    if (userRole == UserRole.engineer && request.userId != userId) {
       throw new AccessError("Заявка назначена другому инженеру");
     }
 
@@ -210,10 +210,7 @@ export class RequestService {
         );
       }
 
-      if (
-        data.status === "in_progress" &&
-        !(data.assignee ?? request.assignee)
-      ) {
+      if (data.status === "in_progress" && !(data.assignee ?? request.userId)) {
         throw new HttpError(400, "Сначала назначьте исполнителя");
       }
 
@@ -249,7 +246,7 @@ export class RequestService {
         continue;
       }
 
-      request.set(field, value);
+      // request.set(field, value);
       // await addHistory(
       //   request.id,
       //   actor,
