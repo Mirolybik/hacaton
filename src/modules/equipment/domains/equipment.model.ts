@@ -37,49 +37,49 @@ export class Equipment extends Model<
     allowNull: true,
     field: "level_0",
   })
-  declare level0: string;
+  declare level0: string | null;
 
   @Column({
     type: DataType.STRING(100),
     allowNull: true,
     field: "level_1",
   })
-  declare level1: string;
+  declare level1: string | null;
 
   @Column({
     type: DataType.STRING(100),
     allowNull: true,
     field: "level_2",
   })
-  declare level2: string;
+  declare level2: string | null;
 
   @Column({
     type: DataType.STRING(100),
     allowNull: true,
     field: "level_3",
   })
-  declare level3: string;
+  declare level3: string | null;
 
   @Column({
     type: DataType.STRING(100),
     allowNull: true,
     field: "level_4",
   })
-  declare level4: string;
+  declare level4: string | null;
 
   @Column({
     type: DataType.STRING(100),
     allowNull: true,
     field: "level_5",
   })
-  declare level5: string;
+  declare level5: string | null;
 
   @Column({
     type: DataType.STRING(100),
     allowNull: true,
     field: "level_6",
   })
-  declare level6: string;
+  declare level6: string | null;
 
   @Column({
     type: DataType.STRING(100),
@@ -127,7 +127,7 @@ export class Equipment extends Model<
     type: DataType.TEXT,
     allowNull: true,
   })
-  declare comment: string;
+  declare comment: string | null;
 
   @HasMany(() => EquipmentHistory)
   declare history?: EquipmentHistory[];
