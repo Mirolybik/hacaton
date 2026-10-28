@@ -27,6 +27,7 @@
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^22.5.0",
     "@types/pg": "^8.11.6",
+    "sequelize-cli": "^6.6.5",
     "typescript": "^5.5.4"
   }
 }

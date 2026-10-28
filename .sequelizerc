@@ -1,0 +1,8 @@
+const path = require("path")
+
+const folderPath = process.env.NODE_ENV === "production" ? "dist" : "src"
+
+module.exports = {
+    config: path.resolve(`${folderPath}/db`, "config.js"),
+    "migrations-path": path.resolve(`${folderPath}/db`, "migrations"),
+}
