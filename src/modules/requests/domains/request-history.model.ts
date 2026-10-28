@@ -53,7 +53,6 @@ export class RequestHistory extends Model {
   declare newValue: string | null;
 
   @CreatedAt
-  @Column
   declare createdAt: Date;
 
   @Column(DataType.UUID)

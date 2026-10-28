@@ -1,4 +1,3 @@
-import { Op } from "sequelize";
 import { HttpError } from "../../lib/http-error";
 import type {
   CreateRequestInput,
@@ -150,29 +149,7 @@ export class RequestService {
     userRole: UserRole,
     userId: string,
   ) {
-    const where: any = {};
-    if (query.status) {
-      where.status = query.status;
-    }
-    if (query.type) {
-      where.type = query.type;
-    }
-    if (query.priority) {
-      where.priority = query.priority;
-    }
-    if (query.assignee) {
-      where.assignee = query.assignee;
-    }
-    if (query.equipmentId) {
-      where.equipmentId = query.equipmentId;
-    }
-    if (userRole == UserRole.engineer) {
-      where[Op.or] = [{ assignee: null }, { assignee: userId }];
-    }
-    return Request.findAll({
-      where,
-      order: [["createdAt", "DESC"]],
-    });
+    return this.repository.getList(query, userRole, userId);
   }
 
   public async update(
