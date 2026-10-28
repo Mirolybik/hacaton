@@ -26,7 +26,7 @@ import { Equipment } from "../../equipment/domains/equipment.model";
 })
 export class Request extends Model<
   InferAttributes<Request>,
-  InferCreationAttributes<Request>
+  InferCreationAttributes<Request, { omit: "overdue" }>
 > {
   @Column({
     type: DataType.UUID,
@@ -82,32 +82,37 @@ export class Request extends Model<
   @Column({
     type: DataType.TEXT,
     allowNull: true,
+    defaultValue: null,
   })
-  declare diagnostics: string;
+  declare diagnostics: string | null;
 
   @Column({
     type: DataType.TEXT,
     allowNull: true,
+    defaultValue: null,
   })
-  declare workDescription: string;
+  declare workDescription: string | null;
 
   @Column({
     type: DataType.TEXT,
     allowNull: true,
+    defaultValue: null,
   })
-  declare waitingComment: string;
+  declare waitingComment: string | null;
 
   @Column({
     type: DataType.TEXT,
     allowNull: true,
+    defaultValue: null,
   })
-  declare closingComment: string;
+  declare closingComment: string | null;
 
   @Column({
     type: DataType.DATE,
     allowNull: true,
+    defaultValue: null,
   })
-  declare completedAt: Date;
+  declare completedAt: Date | null;
 
   @Column({
     type: DataType.VIRTUAL,
@@ -117,14 +122,15 @@ export class Request extends Model<
       return status !== "done" && new Date(dueAt) < new Date();
     },
   })
-  declare overdue: string;
+  declare overdue: boolean;
 
   @Column({
     type: DataType.UUID,
     allowNull: true,
+    defaultValue: null,
   })
   @ForeignKey(() => User)
-  declare userId: string;
+  declare userId: string | null;
 
   @BelongsTo(() => User)
   declare user?: User;
@@ -132,9 +138,10 @@ export class Request extends Model<
   @Column({
     type: DataType.UUID,
     allowNull: true,
+    defaultValue: null,
   })
   @ForeignKey(() => Equipment)
-  declare equipmentId: string;
+  declare equipmentId: string | null;
 
   @BelongsTo(() => Equipment)
   declare equipment?: Equipment;

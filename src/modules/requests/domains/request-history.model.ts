@@ -1,66 +1,67 @@
-import { DataTypes, Model } from "sequelize";
-import { sequelize } from "../../../db";
+import {
+  Table,
+  Column,
+  Model,
+  DataType,
+  PrimaryKey,
+  Default,
+  AllowNull,
+  ForeignKey,
+  BelongsTo,
+  CreatedAt,
+} from "sequelize-typescript";
 import { Request } from "./request.model";
 
+@Table({
+  tableName: "request_history",
+  underscored: true,
+  updatedAt: false,
+})
 export class RequestHistory extends Model {
+  @PrimaryKey
+  @Default(DataType.UUIDV4)
+  @Column(DataType.UUID)
   declare id: string;
+
+  @ForeignKey(() => Request)
+  @AllowNull(false)
+  @Column({
+    type: DataType.UUID,
+    onDelete: "CASCADE",
+  })
   declare requestId: string;
+
+  @AllowNull(false)
+  @Column(DataType.STRING(150))
   declare userName: string;
+
+  @AllowNull(false)
+  @Column(DataType.STRING(30))
   declare userRole: string;
+
+  @AllowNull(false)
+  @Column(DataType.STRING(50))
   declare action: string;
+
+  @Column(DataType.STRING(100))
   declare field: string | null;
+
+  @Column(DataType.TEXT)
   declare oldValue: string | null;
+
+  @Column(DataType.TEXT)
   declare newValue: string | null;
+
+  @CreatedAt
+  @Column
   declare createdAt: Date;
+
+  @Column(DataType.UUID)
   declare userId: string;
+
+  @BelongsTo(() => Request, {
+    foreignKey: "requestId",
+    as: "request",
+  })
+  declare request: Request;
 }
-
-RequestHistory.init(
-  {
-    id: {
-      type: DataTypes.UUID,
-      defaultValue: DataTypes.UUIDV4,
-      primaryKey: true,
-    },
-    requestId: {
-      type: DataTypes.UUID,
-      allowNull: false,
-      references: { model: Request, key: "id" },
-      onDelete: "CASCADE",
-    },
-    userName: {
-      type: DataTypes.STRING(150),
-      allowNull: false,
-    },
-    userRole: {
-      type: DataTypes.STRING(30),
-      allowNull: false,
-    },
-    action: {
-      type: DataTypes.STRING(50),
-      allowNull: false,
-    },
-    field: {
-      type: DataTypes.STRING(100),
-    },
-    oldValue: {
-      type: DataTypes.TEXT,
-    },
-    newValue: {
-      type: DataTypes.TEXT,
-    },
-  },
-  {
-    sequelize,
-    tableName: "request_history",
-    underscored: true,
-    updatedAt: false,
-  },
-);
-
-Request.hasMany(RequestHistory, {
-  foreignKey: "requestId",
-  as: "history",
-  onDelete: "CASCADE",
-});
-RequestHistory.belongsTo(Request, { foreignKey: "requestId", as: "request" });

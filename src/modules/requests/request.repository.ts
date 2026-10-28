@@ -1,7 +1,9 @@
+import { randomUUID } from "crypto";
 import { RequestHistory } from "./domains/request-history.model";
 import { RequestStatus } from "./domains/request-info.types";
 import { Request } from "./domains/request.model";
 import { CreateRequestInput } from "./request.schema";
+import { v4 as uuidv4 } from "uuid";
 
 export class RequestRepository {
   public async getRequest(id: string): Promise<Request | null> {
@@ -13,15 +15,17 @@ export class RequestRepository {
   }
 
   public async createRequest(data: CreateRequestInput): Promise<Request> {
-    // const result = await Request.create({
-    //   type: data.type,
-    //   equipmentId: data.equipmentId,
-    //   description: data.description,
-    //   priority: data.priority,
-    //   authorName: data.authorName,
-    //   authorContact: data.authorContact,
-    //   dueAt: data.dueAt,
-    // });
+    const result = await Request.create({
+      id: uuidv4(),
+      status: "new",
+      type: data.type,
+      equipmentId: data.equipmentId,
+      description: data.description,
+      priority: data.priority,
+      authorName: data.authorName,
+      authorContact: data.authorContact,
+      dueAt: data.dueAt,
+    });
     return result;
   }
 
