@@ -324,3 +324,61 @@ https://github.com/Mirolybik/hacaton
 Проект создан в рамках хакатона для разработки системы, упрощающей работу с заявками на техническое обслуживание оборудования ветропарка.
 
 Основная цель — обеспечить удобную регистрацию, обработку и контроль выполнения технических работ.
+
+
+## Деплой приложения через Docker
+
+Для запуска приложения необходимы Git и Docker Desktop.
+
+### 1. Клонирование проекта
+
+```bash
+git clone https://github.com/Mirolybik/hacaton.git
+cd hacaton
+```
+
+### 2. Сборка и запуск
+
+```bash
+docker compose up -d --build
+```
+
+Команда собирает образы и запускает frontend,
+backend и PostgreSQL.
+
+### 3. Проверка контейнеров
+
+```bash
+docker compose ps
+```
+
+### 4. Адреса приложения
+
+- Frontend: http://localhost:8080
+- Backend: http://localhost:3000
+- Проверка API: http://localhost:3000/api/health
+
+### 5. Просмотр логов
+
+```bash
+docker compose logs -f
+```
+
+### 6. Обновление приложения
+
+```bash
+git pull --ff-only
+docker compose up -d --build
+```
+
+### 7. Остановка приложения
+
+```bash
+docker compose down
+```
+
+Данные PostgreSQL сохраняются в Docker volume.
+
+Примечание: инструкция предназначена для локального
+развёртывания и демонстрации проекта.
+```
