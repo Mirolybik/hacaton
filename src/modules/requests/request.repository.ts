@@ -1,7 +1,11 @@
+import { randomUUID } from "crypto";
 import { RequestHistory } from "./domains/request-history.model";
 import { RequestStatus } from "./domains/request-info.types";
 import { Request } from "./domains/request.model";
-import { CreateRequestInput } from "./request.schema";
+import { CreateRequestInput, ListRequestsQuery } from "./request.schema";
+import { v4 as uuidv4 } from "uuid";
+import { UserRole } from "../user/domains/user-role.enum";
+import { Op } from "sequelize";
 
 export class RequestRepository {
   public async getRequest(id: string): Promise<Request | null> {
@@ -12,16 +16,48 @@ export class RequestRepository {
     return result;
   }
 
+  public async getList(
+    query: ListRequestsQuery,
+    userRole: UserRole,
+    userId: string,
+  ) {
+    const where: any = {};
+    if (query.status) {
+      where.status = query.status;
+    }
+    if (query.type) {
+      where.type = query.type;
+    }
+    if (query.priority) {
+      where.priority = query.priority;
+    }
+    if (query.assignee) {
+      where.assignee = query.assignee;
+    }
+    if (query.equipmentId) {
+      where.equipmentId = query.equipmentId;
+    }
+    if (userRole == UserRole.engineer) {
+      where[Op.or] = [{ assignee: null }, { assignee: userId }];
+    }
+    return Request.findAll({
+      where,
+      order: [["createdAt", "DESC"]],
+    });
+  }
+
   public async createRequest(data: CreateRequestInput): Promise<Request> {
-    // const result = await Request.create({
-    //   type: data.type,
-    //   equipmentId: data.equipmentId,
-    //   description: data.description,
-    //   priority: data.priority,
-    //   authorName: data.authorName,
-    //   authorContact: data.authorContact,
-    //   dueAt: data.dueAt,
-    // });
+    const result = await Request.create({
+      id: uuidv4(),
+      status: "new",
+      type: data.type,
+      equipmentId: data.equipmentId,
+      description: data.description,
+      priority: data.priority,
+      authorName: data.authorName,
+      authorContact: data.authorContact,
+      dueAt: data.dueAt,
+    });
     return result;
   }
 
