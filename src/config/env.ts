@@ -18,6 +18,7 @@ const envSchema = z.object({
   DB_PASSWORD: z.string().default("postgres"),
   JWT_SECRET_KEY: z.string(),
   JWT_MAX_AGE_S: z.coerce.number().default(900),
+  FRONT_CORS: z.string().min(1),
 });
 
 export const env = envSchema.parse(process.env);

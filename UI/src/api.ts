@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 
 const LS_KEY = "whoami";
 
-export function saveUser(user: { name: any; role: any; }) {
+export function saveUser(user: { name: any; role: any }) {
   localStorage.setItem(LS_KEY, JSON.stringify(user));
 }
 
@@ -23,7 +23,7 @@ export function clearUser() {
 
 async function request(path: string, options: any = {}) {
   const me = loadUser();
-  const headers: any = { "content-type": "application/json"};
+  const headers: any = { "content-type": "application/json" };
   if (me) {
     headers["x-user-name"] = encodeURIComponent(me.name);
     headers["x-user-role"] = me.role;
@@ -53,7 +53,7 @@ export async function login(email: string, password: string) {
     method: "POST",
     credentials: "include",
     headers: { "content-type": "application/json" },
-    body: JSON.stringify({ login: email, password }),
+    body: JSON.stringify({ email, password }),
   });
 
   if (!resp.ok) {
@@ -64,7 +64,6 @@ export async function login(email: string, password: string) {
     } catch {}
     throw new Error(text);
   }
-
 
   const data = await resp.json().catch(() => ({}));
   const user = {
@@ -95,8 +94,14 @@ export function takeRequest(id: string) {
   return request("/requests/" + id + "/take", { method: "POST" });
 }
 
-export function patchRequest(id: string, data: { priority?: string; assignee?: string; }) {
-  return request("/requests/" + id, { method: "PATCH", body: JSON.stringify(data) });
+export function patchRequest(
+  id: string,
+  data: { priority?: string; assignee?: string },
+) {
+  return request("/requests/" + id, {
+    method: "PATCH",
+    body: JSON.stringify(data),
+  });
 }
 
 export function getEquipment() {

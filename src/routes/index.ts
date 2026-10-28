@@ -9,5 +9,5 @@ export const apiRouter = Router();
 
 apiRouter.use("/health", healthRouter);
 apiRouter.use("/auth", authRouter);
-apiRouter.use("/request", authenticate, requestRouter);
+apiRouter.use("/requests", authenticate, requestRouter);
 apiRouter.use("/equipment", authenticate, equipmentRouter);
