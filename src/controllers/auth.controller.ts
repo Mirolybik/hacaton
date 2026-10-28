@@ -1,5 +1,29 @@
-export async function login(req: Request, res: Response) {}
+import { Request, Response } from "express";
+import { AuthService } from "../services/auth.service";
+import { env } from "../config/env";
 
-export async function logout(req: Request, res: Response) {}
+export class AuthController {
+  private readonly authService = new AuthService();
 
-export async function refresh(req: Request, res: Response) {}
+  public login = async (req: Request, res: Response) => {
+    const { login, password } = req.body;
+    const result = await this.authService.login(login, password);
+
+    res.cookie("accessToken", result, {
+      httpOnly: true,
+      secure: false,
+      sameSite: "strict",
+      maxAge: env.JWT_MAX_AGE_S * 1000,
+    });
+
+    return res.status(200).send();
+  };
+
+  public logout = async (req: Request, res: Response) => {
+    res.clearCookie("accessToken", {
+      httpOnly: true,
+      secure: false,
+      sameSite: "strict",
+    });
+  };
+}
