@@ -1,8 +1,8 @@
-'use strict';
-import { DataTypes } from 'sequelize';
+"use strict";
+import { DataTypes } from "sequelize";
 
 export async function up(queryInterface) {
-  await queryInterface.createTable('Users', {
+  await queryInterface.createTable("Users", {
     id: {
       type: DataTypes.UUID,
       allowNull: false,
@@ -58,5 +58,5 @@ export async function up(queryInterface) {
 }
 
 export async function down(queryInterface) {
-  await queryInterface.dropTable('Users');
+  await queryInterface.dropTable("Users");
 }

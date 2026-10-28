@@ -9,7 +9,7 @@ export async function authenticate(
   res: Response,
   next: NextFunction,
 ) {
-  const token = req?.cookies?.refreshToken;
+  const token = req?.cookies?.accessToken;
   if (!token) {
     return next(new AuthenticationError("Токен не предоставлен"));
   }

@@ -6,8 +6,8 @@ export class AuthController {
   private readonly authService = new AuthService();
 
   public login = async (req: Request, res: Response) => {
-    const { login, password } = req.body;
-    const result = await this.authService.login(login, password);
+    const { email, password } = req.body;
+    const result = await this.authService.login(email, password);
 
     res.cookie("accessToken", result, {
       httpOnly: true,

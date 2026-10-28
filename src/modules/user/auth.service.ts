@@ -9,7 +9,6 @@ const repository = new UserRepository();
 export class AuthService {
   public async login(email: string, password: string): Promise<string> {
     const userInfo = await repository.getByEmail(email);
-
     if (!userInfo) {
       throw new AuthenticationError("Неверные данные для входа");
     }
@@ -19,7 +18,7 @@ export class AuthService {
       throw new AuthenticationError("Неверные данные для входа");
     }
 
-    return this.createJwt(userInfo);
+    return this.createJwt({ id: userInfo.id, role: userInfo.role });
   }
 
   public async logout() {}

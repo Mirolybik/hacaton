@@ -5,7 +5,7 @@ export class UserRepository {
   public async getByEmail(email: string): Promise<UserInfoDto | null> {
     const result = (await User.findOne({
       where: { email: email },
-      attributes: ["id", "email", "password", "role", ["shortName", "name"]],
+      attributes: ["id", "email", "password", "role"],
     })) as unknown as UserInfoDto;
 
     return result;

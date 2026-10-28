@@ -1,8 +1,8 @@
-'use strict';
-import { DataTypes } from 'sequelize';
+"use strict";
+import { DataTypes } from "sequelize";
 
 export async function up(queryInterface) {
-  await queryInterface.createTable('requests', {
+  await queryInterface.createTable("requests", {
     id: {
       type: DataTypes.UUID,
       allowNull: false,
@@ -19,11 +19,11 @@ export async function up(queryInterface) {
       type: DataTypes.STRING(100),
       allowNull: true,
       references: {
-        model: 'equipment',
-        key: 'equipment_id',
+        model: "equipment",
+        key: "equipment_id",
       },
-      onUpdate: 'CASCADE',
-      onDelete: 'SET NULL',
+      onUpdate: "CASCADE",
+      onDelete: "SET NULL",
     },
 
     description: {
@@ -34,13 +34,13 @@ export async function up(queryInterface) {
     priority: {
       type: DataTypes.STRING(20),
       allowNull: false,
-      defaultValue: 'normal',
+      defaultValue: "normal",
     },
 
     status: {
       type: DataTypes.STRING(30),
       allowNull: false,
-      defaultValue: 'new',
+      defaultValue: "new",
     },
 
     author_name: {
@@ -101,5 +101,5 @@ export async function up(queryInterface) {
 }
 
 export async function down(queryInterface) {
-  await queryInterface.dropTable('requests');
+  await queryInterface.dropTable("requests");
 }

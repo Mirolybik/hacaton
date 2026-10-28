@@ -46,16 +46,6 @@ export class User extends Model<
   declare middleName: string;
 
   @Column({
-    type: DataType.VIRTUAL,
-    get(this: User): string {
-      return [this.lastName, this.firstName, this.middleName]
-        .filter(Boolean)
-        .join(" ");
-    },
-  })
-  declare shortName: string;
-
-  @Column({
     type: DataType.ENUM(...Object.values(UserRole)),
     allowNull: false,
   })
