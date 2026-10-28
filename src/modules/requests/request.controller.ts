@@ -1,65 +1,54 @@
-import type express from 'express';
-import { asyncHandler } from '../../lib/async-handler';
-import { HttpError } from '../../lib/http-error';
-import {
-  createRequestSchema,
-  listRequestsQuerySchema,
-  updateRequestSchema,
-} from './request.schema';
-import {
-  createRequest,
-  getRequest,
-  getStats,
-  listRequests,
-  takeRequest,
-  updateRequest,
-  type Actor,
-} from './request.service';
+import { Request, Response } from "express";
+import { RequestService } from "./request.service";
+import { User } from "../user/domains/user.model";
 
-function getActor(req: express.Request): Actor {
-  const name = req.header('x-user-name');
-  const role = req.header('x-user-role');
+export class RequestController {
+  private readonly service = new RequestService();
 
-  if (!name || !role) {
-    throw new HttpError(401, 'Нужны заголовки x-user-name и x-user-role');
-  }
+  public create = async (req: Request, res: Response) => {
+    const request = await this.service.create(req.body, res.locals.user.id);
 
-  if (role !== 'duty' && role !== 'engineer' && role !== 'director') {
-    throw new HttpError(403, 'Неизвестная роль');
-  }
+    res.status(201).json(request);
+  };
 
-  return { name: decodeURIComponent(name), role };
+  public getById = async (req: Request, res: Response) => {
+    const request = await this.service.getById(
+      req.params.id,
+      res.locals.user.id,
+    );
+    res.json(request);
+  };
+
+  public update = async (req: Request, res: Response) => {
+    const request = await this.service.update(
+      req.params.id,
+      req.body,
+      res.locals.user.id,
+      res.locals.user.role,
+    );
+    res.json(request);
+  };
+
+  public getStats = async (req: Request, res: Response) => {
+    const result = await this.service.getStats();
+    res.json(result);
+  };
+
+  public getList = async (req: Request, res: Response) => {
+    const result = await this.service.getList(
+      res.locals.query,
+      res.locals.user.role,
+      res.locals.user.id,
+    );
+    res.json(result);
+  };
+
+  public take = async (req: Request, res: Response) => {
+    const result = await this.service.takeRequest(
+      req.params.id,
+      res.locals.user.id,
+      res.locals.user.role,
+    );
+    res.json(result);
+  };
 }
-
-export const create = asyncHandler(async (req, res) => {
-  const request = await createRequest(createRequestSchema.parse(req.body), getActor(req));
-  res.status(201).json(request);
-});
-
-export const list = asyncHandler(async (req, res) => {
-  const requests = await listRequests(listRequestsQuerySchema.parse(req.query), getActor(req));
-  res.json(requests);
-});
-
-export const getById = asyncHandler(async (req, res) => {
-  const request = await getRequest(req.params.id, getActor(req));
-  res.json(request);
-});
-
-export const update = asyncHandler(async (req, res) => {
-  const request = await updateRequest(
-    req.params.id,
-    updateRequestSchema.parse(req.body),
-    getActor(req),
-  );
-  res.json(request);
-});
-
-export const take = asyncHandler(async (req, res) => {
-  const request = await takeRequest(req.params.id, getActor(req));
-  res.json(request);
-});
-
-export const stats = asyncHandler(async (req, res) => {
-  res.json(await getStats(getActor(req)));
-});
