@@ -22,6 +22,10 @@ COPY package*.json ./
 RUN npm ci --omit=dev && npm cache clean --force
 
 COPY --from=build /src/dist ./dist
+COPY .sequelizerc ./
+COPY src/db/config.js ./dist/db/config.js
+COPY src/db/migrations ./dist/db/migrations
+COPY src/db/seeds ./dist/db/seeds
 
 EXPOSE 3000
 
