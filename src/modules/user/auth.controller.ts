@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
-import { AuthService } from "../services/auth.service";
-import { env } from "../config/env";
+import { AuthService } from "./auth.service";
+import { env } from "../../config/env";
 
 export class AuthController {
   private readonly authService = new AuthService();

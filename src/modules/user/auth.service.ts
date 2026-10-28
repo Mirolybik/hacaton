@@ -1,8 +1,8 @@
-import { env } from "../config/env";
-import { AuthenticationError } from "../errors/authentication.error";
-import { UserRepository } from "../repositories/user.repository";
+import { env } from "../../config/env";
+import { AuthenticationError } from "../../errors/authentication.error";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import { UserRepository } from "./user.repository";
 
 const repository = new UserRepository();
 

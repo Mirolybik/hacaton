@@ -1,6 +1,6 @@
 import { InferAttributes, InferCreationAttributes } from "sequelize";
 import { Column, DataType, Model, Table } from "sequelize-typescript";
-import { UserRole } from "../../domains/enums/user-role.enum";
+import { UserRole } from "./user-role.enum";
 
 @Table
 export class User extends Model<

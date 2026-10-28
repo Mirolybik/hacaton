@@ -1,6 +1,5 @@
-import { sequelize } from "../db";
-import { User } from "../db/models/user.model";
-import { UserInfoDto } from "../dto/user.dto";
+import { User } from "./domains/user.model";
+import { UserInfoDto } from "./dto/user.dto";
 
 export class UserRepository {
   public async getByEmail(email: string): Promise<UserInfoDto | null> {

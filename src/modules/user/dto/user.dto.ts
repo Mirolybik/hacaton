@@ -1,4 +1,4 @@
-import { UserRole } from "../domains/enums/user-role.enum";
+import { UserRole } from "../domains/user-role.enum";
 
 export interface UserInfoDto {
   password: string;

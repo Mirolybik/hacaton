@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
-import { UserRole } from "../domains/enums/user-role.enum.js";
-import { UserInfoDto } from "../dto/user.dto.js";
+import { UserRole } from "../modules/user/domains/user-role.enum.js";
+import { UserInfoDto } from "../modules/user/dto/user.dto.js";
 import { AccessError } from "../errors/access.error.js";
 
 export function checkAccess(allowedRoles: UserRole[]) {
