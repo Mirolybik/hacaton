@@ -98,3 +98,22 @@ export function takeRequest(id: string) {
 export function patchRequest(id: string, data: { priority?: string; assignee?: string; }) {
   return request("/requests/" + id, { method: "PATCH", body: JSON.stringify(data) });
 }
+
+export function getEquipment() {
+  return request("/equipment");
+}
+
+export function createRequest(data: {
+  type: "inspection" | "repair";
+  equipmentId: string;
+  description: string;
+  priority: "low" | "normal" | "high";
+  authorName: string;
+  authorContact: string;
+  dueAt: string;
+}) {
+  return request("/requests", {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+}
