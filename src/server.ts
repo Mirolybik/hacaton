@@ -4,7 +4,7 @@ import { connectDatabase } from "./db";
 import { logger } from "./lib/logger";
 
 async function bootstrap(): Promise<void> {
-  // await connectDatabase();
+  await connectDatabase();
 
   const app = createApp();
 
