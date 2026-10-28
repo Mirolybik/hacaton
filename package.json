@@ -4,7 +4,11 @@
   "private": true,
   "main": "dist/server.js",
   "scripts": {
+<<<<<<< HEAD
     "build": "tsc -p tsconfig.json --nocheck",
+=======
+    "build": "tsc -p tsconfig.json --noCheck",
+>>>>>>> a07d0515abc4f0905220bf3a5b1891f6eb3acf52
     "start": "node dist/server.js",
     "dev": "tsc -p tsconfig.json && node --watch dist/server.js"
   },
