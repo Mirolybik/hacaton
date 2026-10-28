@@ -1,28 +1,19 @@
-import type { ErrorRequestHandler } from 'express';
+import type express from 'express';
+import { ZodError } from 'zod';
+import { HttpError } from '../lib/http-error';
+import * as logger from '../lib/logger';
 
-import { isProduction } from '../config/env.js';
-import { logger } from '../config/logger.js';
-import { HttpError } from '../utils/http-error.js';
-
-export const errorHandler: ErrorRequestHandler = (err, req, res, _next) => {
-  const isHttpError = err instanceof HttpError;
-  const statusCode = isHttpError ? err.statusCode : 500;
-  const message = isHttpError ? err.message : 'Internal Server Error';
-
-  if (statusCode >= 500) {
-    logger.error({ err, method: req.method, url: req.originalUrl }, 'Request failed');
-  } else {
-    logger.warn({ message, method: req.method, url: req.originalUrl }, 'Request rejected');
+export function errorHandler(err: unknown, _req: express.Request, res: express.Response, _next: express.NextFunction) {
+  if (err instanceof ZodError) {
+    res.status(400).json({ error: 'validation_error', details: err.flatten() });
+    return;
   }
 
-  res.status(statusCode).json({
-    error: {
-      statusCode,
-      message,
-      ...(isHttpError && err.details !== undefined ? { details: err.details } : {}),
-      ...(!isProduction && statusCode >= 500 && err instanceof Error
-        ? { stack: err.stack }
-        : {}),
-    },
-  });
-};
+  if (err instanceof HttpError) {
+    res.status(err.status).json({ error: err.code });
+    return;
+  }
+
+  logger.logger.error({ err }, 'unhandled error');
+  res.status(500).json({ error: 'internal_error' });
+}

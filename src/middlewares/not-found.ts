@@ -1,7 +1,5 @@
-import type { RequestHandler } from 'express';
+import { Request, Response } from 'express';
 
-import { HttpError } from '../utils/http-error.js';
-
-export const notFoundHandler: RequestHandler = (req, _res, next) => {
-  next(HttpError.notFound(`Route ${req.method} ${req.originalUrl} not found`));
-};
+export function notFound(_req: Request, res: Response) {
+  res.status(404).json({ error: 'not_found' });
+}
