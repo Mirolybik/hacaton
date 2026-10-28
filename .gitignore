@@ -6,6 +6,7 @@ dist/
 logs/
 *.log
 coverage/
+*.tsbuildinfo
 .DS_Store
 .idea/
 .vscode/
