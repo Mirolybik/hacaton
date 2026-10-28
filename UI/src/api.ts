@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 
 const LS_KEY = "whoami";
 
-export function saveUser(user) {
+export function saveUser(user: { name: any; role: any; }) {
   localStorage.setItem(LS_KEY, JSON.stringify(user));
 }
 
@@ -21,7 +21,7 @@ export function clearUser() {
   localStorage.removeItem(LS_KEY);
 }
 
-async function request(path, options: any = {}) {
+async function request(path: string, options: any = {}) {
   const me = loadUser();
   const headers: any = { "content-type": "application/json", ...(options.headers || {}) };
   if (me) {
@@ -48,7 +48,7 @@ async function request(path, options: any = {}) {
   return resp.json();
 }
 
-export async function login(email, password) {
+export async function login(email: string, password: string) {
   const resp = await fetch("/api/auth/login", {
     method: "POST",
     credentials: "include",
@@ -82,19 +82,19 @@ export async function logout() {
   } catch {}
 }
 
-export function getRequests(status) {
+export function getRequests(status: string) {
   const url = status ? "/requests?status=" + status : "/requests";
   return request(url);
 }
 
-export function getRequest(id) {
+export function getRequest(id: string) {
   return request("/requests/" + id);
 }
 
-export function takeRequest(id) {
+export function takeRequest(id: string) {
   return request("/requests/" + id + "/take", { method: "POST" });
 }
 
-export function patchRequest(id, data) {
+export function patchRequest(id: string, data: { priority?: string; assignee?: string; }) {
   return request("/requests/" + id, { method: "PATCH", body: JSON.stringify(data) });
 }

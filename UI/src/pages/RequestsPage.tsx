@@ -8,7 +8,7 @@ function RequestsPage({ user, openId, onOpen, onBye }) {
   const [error, setError] = useState("");
   const [filter, setFilter] = useState("");
 
-  const load = async (status?) => {
+  const load = async (status?: string) => {
     setError("");
     try {
       const data = await getRequests(status || undefined);
@@ -19,14 +19,10 @@ function RequestsPage({ user, openId, onOpen, onBye }) {
     }
   };
 
-  useEffect(() => {
-    load();
-  }, []);
-
   if (openId) {
     const handleBack = () => {
       onOpen(null);
-      load(filter); 
+      load(filter);
     };
 
     return <RequestDetailPage id={openId} user={user} onBack={handleBack} />;
