@@ -23,7 +23,7 @@ export function clearUser() {
 
 async function request(path: string, options: any = {}) {
   const me = loadUser();
-  const headers: any = { "content-type": "application/json", ...(options.headers || {}) };
+  const headers: any = { "content-type": "application/json"};
   if (me) {
     headers["x-user-name"] = encodeURIComponent(me.name);
     headers["x-user-role"] = me.role;
