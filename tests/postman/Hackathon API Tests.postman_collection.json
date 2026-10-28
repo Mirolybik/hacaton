@@ -1,0 +1,334 @@
+{
+  "info": {
+    "_postman_id": "8ace0dc0-b25e-477f-99d5-1007e72d596e",
+    "name": "Hackathon API Tests",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "41190297",
+    "_collection_link": "https://go.postman.co/collection/41190297-8ace0dc0-b25e-477f-99d5-1007e72d596e?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "Проверка работы API",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "\r\npm.test(\"Статус ответа — 200\", function () {\r\n    pm.response.to.have.status(200);\r\n});\r\n\r\npm.test(\"Сервер возвращает status: ok\", function () {\r\n    const json = pm.response.json();\r\n    pm.expect(json.status).to.eql(\"ok\");\r\n});\r\n\r\n\r\npm.test(\"Ответ имеет формат JSON\", function () {\r\n    const contentType = pm.response.headers.get(\"Content-Type\");\r\n\r\n    pm.expect(contentType).to.include(\"application/json\");\r\n});\r\n\r\n"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/health",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "health"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Несуществующий маршрут",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "\r\npm.test(\"Несуществующий маршрут возвращает 404\", function () {\r\n    pm.response.to.have.status(404);\r\n});\r\n\r\npm.test(\"Ошибка возвращается в формате JSON\", function () {\r\n    const contentType = pm.response.headers.get(\"Content-Type\");\r\n    pm.expect(contentType).to.include(\"application/json\");\r\n});\r\n\r\n"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:3000/api/nonexistent",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "api",
+            "nonexistent"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Неверный HTTP-метод",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "\r\npm.test(\"POST на GET-маршрут возвращает 404\", function () {\r\n    pm.response.to.have.status(404);\r\n});\r\n\r\npm.test(\"Сервер возвращает ошибку not_found\", function () {\r\n    const json = pm.response.json();\r\n    pm.expect(json.error).to.eql(\"not_found\");\r\n});\r\n"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:3000/api/health",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "api",
+            "health"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Создание заявки на осмотр",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Заявка создана — 201\", function () {\r\n    pm.response.to.have.status(201);\r\n});\r\n\r\nconst json = pm.response.json();\r\n\r\npm.test(\"Тип заявки — inspection\", function () {\r\n    pm.expect(json.type).to.eql(\"inspection\");\r\n});\r\n\r\npm.test(\"Статус заявки — new\", function () {\r\n    pm.expect(json.status).to.eql(\"new\");\r\n});\r\n\r\npm.test(\"У заявки есть ID\", function () {\r\n    pm.expect(json.id).to.be.a(\"string\").and.not.empty;\r\n});\r\n\r\nif (pm.response.code === 201 && json.id) {\r\n    pm.collectionVariables.set(\"requestId\", json.id);\r\n}"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "x-user-name",
+            "value": "QA Tester"
+          },
+          {
+            "key": "x-user-role",
+            "value": "duty"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"type\": \"inspection\",\r\n  \"equipmentId\": \"QA-TEST-001\",\r\n  \"description\": \"Плановый осмотр ветрогенератора\",\r\n  \"priority\": \"normal\",\r\n  \"authorName\": \"QA Tester\",\r\n  \"authorContact\": \"qa@example.com\",\r\n  \"dueAt\": \"2026-11-05T12:00:00.000Z\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/requests",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "requests"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Назначение инженера и перевод заявки в работу",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Назначение инженера возвращает 200\", function () {\r\n    pm.response.to.have.status(200);\r\n});\r\n\r\nconst json = pm.response.json();\r\n\r\npm.test(\"Заявка переведена в работу\", function () {\r\n    pm.expect(json.status).to.eql(\"in_progress\");\r\n});\r\n\r\npm.test(\"Инженер назначен\", function () {\r\n    pm.expect(json.assignee).to.eql(\"Engineer QA\");\r\n});\r\n\r\npm.test(\"ID заявки совпадает\", function () {\r\n    pm.expect(json.id).to.eql(pm.collectionVariables.get(\"requestId\"));\r\n});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "x-user-name",
+            "value": "\tEngineer QA"
+          },
+          {
+            "key": "x-user-role",
+            "value": "engineer"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/requests/{{requestId}}/take",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "requests",
+            "{{requestId}}",
+            "take"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Закрытие заявки",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Закрытие заявки возвращает 200\", function () {\r\n    pm.response.to.have.status(200);\r\n});\r\n\r\nconst json = pm.response.json();\r\n\r\npm.test(\"Статус заявки — done\", function () {\r\n    pm.expect(json.status).to.eql(\"done\");\r\n});\r\n\r\npm.test(\"Комментарий о закрытии сохранён\", function () {\r\n    pm.expect(json.closingComment).to.be.a(\"string\").and.not.empty;\r\n});\r\n\r\npm.test(\"Дата завершения заполнена\", function () {\r\n    pm.expect(json.completedAt).to.be.a(\"string\").and.not.empty;\r\n});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "x-user-name",
+            "value": "Engineer QA"
+          },
+          {
+            "key": "x-user-role",
+            "value": "engineer"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"status\": \"done\",\r\n  \"closingComment\": \"Плановый осмотр завершён. Оборудование исправно, неисправностей не выявлено.\"\r\n}\r\n",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/requests/{{requestId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "requests",
+            "{{requestId}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Создание заявки на ремонт",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Заявка на ремонт создана — 201\", function () {\r\n    pm.response.to.have.status(201);\r\n});\r\n\r\nconst json = pm.response.json();\r\n\r\npm.test(\"Тип заявки — repair\", function () {\r\n    pm.expect(json.type).to.eql(\"repair\");\r\n});\r\n\r\npm.test(\"Статус заявки — new\", function () {\r\n    pm.expect(json.status).to.eql(\"new\");\r\n});\r\n\r\npm.test(\"Приоритет заявки — high\", function () {\r\n    pm.expect(json.priority).to.eql(\"high\");\r\n});\r\n\r\npm.test(\"У заявки есть уникальный ID\", function () {\r\n    pm.expect(json.id).to.be.a(\"string\").and.not.empty;\r\n});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "x-user-name",
+            "value": "QA Tester"
+          },
+          {
+            "key": "x-user-role",
+            "value": "duty"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"type\": \"repair\",\r\n  \"equipmentId\": \"QA-TEST-001\",\r\n  \"description\": \"Неисправность системы охлаждения ветрогенератора. Требуется ремонт.\",\r\n  \"priority\": \"high\",\r\n  \"authorName\": \"QA Tester\",\r\n  \"authorContact\": \"qa@example.com\",\r\n  \"dueAt\": \"2026-11-05T12:00:00.000Z\"\r\n}\r\n",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/requests",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "requests"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Проверка заявки",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "x-user-name",
+            "value": "Engineer QA"
+          },
+          {
+            "key": "x-user-role",
+            "value": "engineer"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/requests/{{requestId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "requests",
+            "{{requestId}}"
+          ]
+        }
+      },
+      "response": []
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": ""
+    },
+    {
+      "key": "requestId",
+      "value": ""
+    }
+  ]
+}
