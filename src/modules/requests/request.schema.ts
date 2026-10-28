@@ -20,7 +20,7 @@ export const updateRequestSchema = z
     description: z.string().min(1),
     priority: z.enum(REQUEST_PRIORITIES),
     dueAt: z.coerce.date(),
-    assignee: z.string().min(1).nullable(),
+    userId: z.string().min(1).nullable(),
     diagnostics: z.string().nullable(),
     workDescription: z.string().nullable(),
     waitingComment: z.string().nullable(),
