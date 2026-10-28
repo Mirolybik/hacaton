@@ -8,3 +8,10 @@
 6. Dotenv
 7. Pg
 8. Pg-hostore
+
+## Фронтенд Стэк
+
+1. React
+2. ChakraUI
+3. Axios
+4. Vite
