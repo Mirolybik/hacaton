@@ -1,6 +1,10 @@
 import { Sequelize } from "sequelize";
 import { env } from "../config/env";
 import { logger } from "../lib/logger";
+import cls from "cls-hooked";
+
+export const namespace = cls.createNamespace("app-transactions");
+Sequelize.useCLS(namespace);
 
 export const sequelize = new Sequelize(
   env.DB_NAME,

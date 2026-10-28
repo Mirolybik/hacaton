@@ -1,11 +1,15 @@
-import { z } from 'zod';
-import { REQUEST_PRIORITIES, REQUEST_STATUSES, REQUEST_TYPES } from './request.model';
+import { z } from "zod";
+import {
+  REQUEST_PRIORITIES,
+  REQUEST_STATUSES,
+  REQUEST_TYPES,
+} from "./domains/request-info.types";
 
 export const createRequestSchema = z.object({
   type: z.enum(REQUEST_TYPES),
   equipmentId: z.string().min(1),
   description: z.string().min(1),
-  priority: z.enum(REQUEST_PRIORITIES).default('normal'),
+  priority: z.enum(REQUEST_PRIORITIES).default("normal"),
   authorName: z.string().min(1),
   authorContact: z.string().min(1),
   dueAt: z.coerce.date(),

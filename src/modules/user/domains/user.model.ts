@@ -1,6 +1,7 @@
 import { InferAttributes, InferCreationAttributes } from "sequelize";
-import { Column, DataType, Model, Table } from "sequelize-typescript";
+import { Column, DataType, HasMany, Model, Table } from "sequelize-typescript";
 import { UserRole } from "./user-role.enum";
+import { Request } from "../../requests/domains/request.model";
 
 @Table
 export class User extends Model<
@@ -66,4 +67,7 @@ export class User extends Model<
     defaultValue: 0,
   })
   declare tokenVersion: number;
+
+  @HasMany(() => Request)
+  declare requests?: Request[];
 }
