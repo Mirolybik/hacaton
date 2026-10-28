@@ -10,7 +10,7 @@ export class EquipmentRepository {
   }
 
   async getList(): Promise<Equipment[] | null> {
-    const result = await Equipment.findAll({});
+    const result = await Equipment.findAll();
 
     return result;
   }

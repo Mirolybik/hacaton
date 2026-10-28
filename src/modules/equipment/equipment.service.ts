@@ -3,11 +3,15 @@ import { EquipmentRepository } from "./equipment.repository";
 export class EquipmentService {
   private readonly repository = new EquipmentRepository();
 
-  public getById(id: string) {
-    return this.repository.getById(id);
+  public async getById(id: string) {
+    const result = await this.repository.getById(id);
+
+    return result;
   }
 
-  public getList() {
-    return this.repository.getList();
+  public async getList() {
+    const result = await this.repository.getList();
+
+    return result;
   }
 }

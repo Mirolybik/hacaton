@@ -6,13 +6,13 @@ export class EquipmentController {
 
   public getById = async (req: Request, res: Response) => {
     const { id } = req.body;
-    const result = this.service.getById(id);
+    const result = await this.service.getById(id);
 
     res.status(200).json(result);
   };
 
   public get = async (req: Request, res: Response) => {
-    const result = this.service.getList();
+    const result = await this.service.getList();
 
     res.status(200).json(result);
   };
